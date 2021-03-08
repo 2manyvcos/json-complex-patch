@@ -1,4 +1,4 @@
-# json-complex-merge [![npm version](https://badge.fury.io/js/json-complex-merge.svg)](http://npmjs.com/package/json-complex-merge)
+# json-complex-patch [![npm version](https://badge.fury.io/js/json-complex-patch.svg)](http://npmjs.com/package/json-complex-patch)
 
 This library provides functions for validating JSON elements and applying complex patches.
 
