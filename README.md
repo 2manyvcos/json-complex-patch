@@ -1,31 +1,77 @@
-# Why? [![Build Status](https://travis-ci.org/Travelport-Ukraine/npm-module-boilerplate.svg?branch=master)](https://travis-ci.org/Travelport-Ukraine/npm-module-boilerplate)
+# json-complex-merge [![npm version](https://badge.fury.io/js/json-complex-merge.svg)](http://npmjs.com/package/json-complex-merge)
 
-:page_with_curl: Boilerplate for npm/node module. Write with ES6 - have compatibility with all node versions.
+This library provides functions for validating JSON elements and applying complex patches.
 
-This boilerplate is for people who want write code using all ES6 features ( and stage-2 ) but also want/need backward compatibility with old node versions.
+Merging is done in a json-merge-patch like behavior.
 
-# Node version
+Changes are made using [immerjs](https://immerjs.github.io/immer), so function calls are immutable.
 
-This boilerplate uses `babel-preset-env`. Supported `node` version can be defined in `.babelrc`.
+## apply(element, patch)
 
-# Features
+Merges patch into element with json-merge-patch like behavior.
+Changes are made using [immerjs](https://immerjs.github.io/immer), so the result of `apply` is immutable.
 
-- Build with [Babel](https://babeljs.io). (ES6 -> ES5)
-- Test with [mocha](https://mochajs.org).
-- Cover with [istanbul](https://github.com/gotwarlost/istanbul).
-- Check with [eslint](eslint.org).
-- Deploy with [Travis](travis-ci.org).
+```js
+import { apply } from 'json-complex-patch';
 
-# Commands
+apply(
+  { a: { b: [1, 2, 3] } },
+  {
+    a: { b: [4, 5, 6], c: 1 },
+    d: true,
+  },
+);
+// returns { a: { b: [ 4, 5, 6 ], c: 1 }, d: true }
+```
 
-- `npm run clean` - Remove `lib/` directory
-- `npm test` - Run tests. Tests can be written with ES6 (WOW!)
-- `npm test:watch` - You can even re-run tests on file changes!
-- `npm run cover` - Yes. You can even cover ES6 code.
-- `npm run lint` - We recommend using [airbnb-config](https://github.com/airbnb/javascript/tree/master/packages/eslint-config-airbnb). It's fantastic.
-- `npm run build` - Do some magic with ES6 to create ES5 code.
-- `npm run prepublish` - Hook for npm. Do all the checks before publishing you module.
+The function also handles the following additional special keys:
 
-# Installation
+- { "xyz$-": [...comparators] }: Removes all entries in array `xyz` where `compareValue(item, comparator)` returns `true` for one or more items in `...comparators`
+- { "xyz$+": [...values] }: Adds all entries in `...values` to the end of `xyz`
 
-Just clone this repo and remove `.git` folder.
+The keys and actions are applied in the following order if present in the patch:
+
+1. xyz
+2. xyz$-
+3. xyz$+
+
+```js
+import { apply } from 'json-complex-patch';
+
+apply({ a: { b: [1, 2, 3] } }, { a: { 'b$-': [2] } });
+// returns { a: { b: [ 1, 3 ] } }
+
+apply({ a: { x: 1 } }, { a: [1, 2] });
+// returns { a: [ 1, 2 ] }
+
+apply({ a: { b: [1, 2, 3] } }, { a: { 'b$+': [5] } });
+// returns { a: { b: [ 1, 2, 3, 5 ] } }
+
+apply({ a: [{ x: 3 }, { x: [2, 3] }] }, { 'a$-': [{ x: [3] }] });
+// returns { a: [ { x: 3 } ] }
+```
+
+## compareValue(element, comparator)
+
+Compares `element` with `comparator` with the following rules. **All checks ignore the order of objects AND ARRAYS.**
+
+- The type of element and comparator (e.g. undefined, null, number, boolean, array, object, ...) must be the same.
+- If comparator is an array, each item in `comparator` (c) is checked against the items in `element` (item) with `compareValue(item, c)`. For all items in `comparator` there must be at least one matching item in `element`.
+- If comparator is an object, each value in `comparator` (c) is checked against the value in `element` with the same key (item) with `compareValue(item, c)`. All checks must succeed.
+
+```js
+compareValue({ a: 1, b: true, c: [1, 2, 3] }, { a: 1, c: [2] });
+// returns true
+
+compareValue({ a: 1, b: true, c: [1, 2, 3] }, { c: [3, 2, 1], b: true, a: 1 });
+// returns true
+
+compareValue({ a: 1 }, { a: true });
+// returns false
+
+compareValue({ c: [1, 2, 3] }, { a: [4] });
+// returns false
+
+compareValue({}, { a: 1 });
+// returns false
+```
