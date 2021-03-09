@@ -1,9 +1,9 @@
 /* eslint-disable no-loop-func */
 
 import produce from 'immer';
-import compareValue from './compareValue';
+import compare from './compare';
 
-function apply(element, patch) {
+function apply(element, patch, { opRemoveSuffix = '$-', opAddSuffix = '$+' } = {}) {
   return produce({ data: element }, (draft) => {
     let s = {
       value: draft,
@@ -12,8 +12,8 @@ function apply(element, patch) {
       keys: ['data'],
       index: 0,
       ops: {
-        '-': [],
-        '+': [],
+        remove: [],
+        add: [],
       },
     };
 
@@ -22,11 +22,11 @@ function apply(element, patch) {
         // key in segment
         const key = s.keys[s.index];
 
-        if (key.endsWith('$-')) {
-          if (!s.bridge) s.ops['-'].push(key);
+        if (key.endsWith(opRemoveSuffix)) {
+          if (!s.bridge) s.ops.remove.push(key);
           s.index += 1;
-        } else if (key.endsWith('$+')) {
-          if (!s.bridge) s.ops['+'].push(key);
+        } else if (key.endsWith(opAddSuffix)) {
+          if (!s.bridge) s.ops.add.push(key);
           s.index += 1;
         } else {
           const v = s.value[key];
@@ -49,8 +49,8 @@ function apply(element, patch) {
               keys: Object.keys(n),
               index: 0,
               ops: {
-                '-': [],
-                '+': [],
+                remove: [],
+                add: [],
               },
             };
           }
@@ -58,8 +58,8 @@ function apply(element, patch) {
       } else {
         // end of segment
         if (!s.bridge) {
-          if (s.ops['-'].length > 0) {
-            s.ops['-'].forEach((op) => {
+          if (s.ops.remove.length > 0) {
+            s.ops.remove.forEach((op) => {
               const key = op.substring(0, op.length - 2);
               const v = s.value[key];
               const n = s.patch[op];
@@ -72,7 +72,7 @@ function apply(element, patch) {
               } else {
                 if (v == null) s.value[key] = [];
                 const filtered = s.value[key].filter(
-                  (item) => n.findIndex((comparator) => compareValue(item, comparator)) === -1,
+                  (item) => n.findIndex((comparator) => compare(item, comparator)) === -1,
                 );
                 if (filtered.length !== s.value[key].length) {
                   s.value[key] = filtered;
@@ -80,8 +80,8 @@ function apply(element, patch) {
               }
             });
           }
-          if (s.ops['+'].length > 0) {
-            s.ops['+'].forEach((op) => {
+          if (s.ops.add.length > 0) {
+            s.ops.add.forEach((op) => {
               const key = op.substring(0, op.length - 2);
               const v = s.value[key];
               const n = s.patch[op];

@@ -1,2 +1,6 @@
-export { default as apply } from './apply';
-export { default as compareValue } from './compareValue';
+import apply from './apply';
+import compare from './compare';
+
+export default { apply, compare };
+
+export { apply, compare };
