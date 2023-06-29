@@ -1,6 +1,7 @@
 /* eslint-disable no-loop-func */
 
-import produce from 'immer';
+import { produce } from 'immer';
+
 import compare from './compare';
 
 function apply(element, patch, { opRemoveSuffix = '$-', opAddSuffix = '$+' } = {}) {
