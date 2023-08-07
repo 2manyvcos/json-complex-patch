@@ -5,6 +5,9 @@ import { produce } from 'immer';
 import compare from './compare';
 
 function apply(element, patch, { opRemoveSuffix = '$-', opAddSuffix = '$+' } = {}) {
+  const canRemove = typeof opRemoveSuffix === 'string' && opRemoveSuffix;
+  const canAdd = typeof opAddSuffix === 'string' && opAddSuffix;
+
   return produce({ data: element }, (draft) => {
     let s = {
       value: draft,
@@ -23,10 +26,10 @@ function apply(element, patch, { opRemoveSuffix = '$-', opAddSuffix = '$+' } = {
         // key in segment
         const key = s.keys[s.index];
 
-        if (key.endsWith(opRemoveSuffix)) {
+        if (canRemove && key.endsWith(opRemoveSuffix)) {
           if (!s.bridge) s.ops.remove.push(key);
           s.index += 1;
-        } else if (key.endsWith(opAddSuffix)) {
+        } else if (canAdd && key.endsWith(opAddSuffix)) {
           if (!s.bridge) s.ops.add.push(key);
           s.index += 1;
         } else {
@@ -61,7 +64,7 @@ function apply(element, patch, { opRemoveSuffix = '$-', opAddSuffix = '$+' } = {
         if (!s.bridge) {
           if (s.ops.remove.length > 0) {
             s.ops.remove.forEach((op) => {
-              const key = op.substring(0, op.length - 2);
+              const key = op.substring(0, op.length - opRemoveSuffix.length);
               const v = s.value[key];
               const n = s.patch[op];
               if (v != null && !Array.isArray(v)) {
@@ -83,7 +86,7 @@ function apply(element, patch, { opRemoveSuffix = '$-', opAddSuffix = '$+' } = {
           }
           if (s.ops.add.length > 0) {
             s.ops.add.forEach((op) => {
-              const key = op.substring(0, op.length - 2);
+              const key = op.substring(0, op.length - opAddSuffix.length);
               const v = s.value[key];
               const n = s.patch[op];
               if (v != null && !Array.isArray(v)) {

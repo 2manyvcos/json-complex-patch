@@ -27,7 +27,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hatsuo/json-complex-patch.git"
+    "url": "git+https://github.com/2manyvcos/json-complex-patch.git"
   },
   "keywords": [
     "json",
@@ -37,9 +37,9 @@
   "author": "Aaron Burmeister",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/hatsuo/json-complex-patch/issues"
+    "url": "https://github.com/2manyvcos/json-complex-patch/issues"
   },
-  "homepage": "https://github.com/hatsuo/json-complex-patch#readme",
+  "homepage": "https://github.com/2manyvcos/json-complex-patch#readme",
   "devDependencies": {
     "@babel/cli": "^7.22.5",
     "@babel/core": "^7.22.5",
