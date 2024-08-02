@@ -6,7 +6,7 @@ Merging is done in a json-merge-patch like behavior.
 
 Changes are made using [immerjs](https://immerjs.github.io/immer), so function calls are immutable.
 
-## apply(element, patch)
+## apply(element, patch, options)
 
 Merges patch into element with json-merge-patch like behavior.
 Changes are made using [immerjs](https://immerjs.github.io/immer), so the result of `apply` is immutable.
@@ -26,7 +26,7 @@ apply(
 
 The function also handles the following additional special keys:
 
-- { "xyz$-": [...comparators] }: Removes all entries in array `xyz` where `compareValue(item, comparator)` returns `true` for one or more items in `...comparators`
+- { "xyz$-": [...comparators] }: Removes all entries in array `xyz` where `compare(item, comparator)` returns `true` for one or more items in `...comparators`
 - { "xyz$+": [...values] }: Adds all entries in `...values` to the end of `xyz`
 
 The keys and actions are applied in the following order if present in the patch:
@@ -51,29 +51,38 @@ apply({ a: [{ x: 3 }, { x: [2, 3] }] }, { 'a$-': [{ x: [3] }] });
 // returns { a: [ { x: 3 } ] }
 ```
 
-## compareValue(element, comparator)
+The options object can be used to customize the request:
+
+```js
+apply(element, patch, {
+  opRemoveSuffix: '$-',
+  opAddSuffix: '$+',
+});
+```
+
+## compare(element, comparator)
 
 Compares `element` with `comparator` with the following rules. **All checks ignore the order of objects AND ARRAYS.**
 
 - The type of element and comparator (e.g. undefined, null, number, boolean, array, object, ...) must be the same.
-- If comparator is an array, each item in `comparator` (c) is checked against the items in `element` (item) with `compareValue(item, c)`. For all items in `comparator` there must be at least one matching item in `element`.
-- If comparator is an object, each value in `comparator` (c) is checked against the value in `element` with the same key (item) with `compareValue(item, c)`. All checks must succeed.
+- If comparator is an array, each item in `comparator` (c) is checked against the items in `element` (item) with `compare(item, c)`. For all items in `comparator` there must be at least one matching item in `element`.
+- If comparator is an object, each value in `comparator` (c) is checked against the value in `element` with the same key (item) with `compare(item, c)`. All checks must succeed.
 
 ```js
-import { compareValue } from 'json-complex-patch';
+import { compare } from 'json-complex-patch';
 
-compareValue({ a: 1, b: true, c: [1, 2, 3] }, { a: 1, c: [2] });
+compare({ a: 1, b: true, c: [1, 2, 3] }, { a: 1, c: [2] });
 // returns true
 
-compareValue({ a: 1, b: true, c: [1, 2, 3] }, { c: [3, 2, 1], b: true, a: 1 });
+compare({ a: 1, b: true, c: [1, 2, 3] }, { c: [3, 2, 1], b: true, a: 1 });
 // returns true
 
-compareValue({ a: 1 }, { a: true });
+compare({ a: 1 }, { a: true });
 // returns false
 
-compareValue({ c: [1, 2, 3] }, { a: [4] });
+compare({ c: [1, 2, 3] }, { a: [4] });
 // returns false
 
-compareValue({}, { a: 1 });
+compare({}, { a: 1 });
 // returns false
 ```

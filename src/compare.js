@@ -4,7 +4,7 @@ function getType(element) {
   return typeof element;
 }
 
-function compareValue(element, comparator) {
+function compare(element, comparator) {
   const elemType = getType(element);
   const compType = getType(comparator);
 
@@ -12,14 +12,11 @@ function compareValue(element, comparator) {
 
   switch (compType) {
     case 'array':
-      return !(
-        comparator.findIndex((n) => element.findIndex((v) => compareValue(v, n)) === -1) !== -1
-      );
+      return !(comparator.findIndex((n) => element.findIndex((v) => compare(v, n)) === -1) !== -1);
 
     case 'object':
       return !(
-        Object.keys(comparator).findIndex((key) => !compareValue(element[key], comparator[key])) !==
-        -1
+        Object.keys(comparator).findIndex((key) => !compare(element[key], comparator[key])) !== -1
       );
 
     default:
@@ -27,4 +24,4 @@ function compareValue(element, comparator) {
   }
 }
 
-export default compareValue;
+export default compare;
