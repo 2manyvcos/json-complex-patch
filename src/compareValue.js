@@ -1,6 +1,6 @@
 function getType(element) {
-  if (element === null) return "null";
-  if (Array.isArray(element)) return "array";
+  if (element === null) return 'null';
+  if (Array.isArray(element)) return 'array';
   return typeof element;
 }
 
@@ -11,18 +11,15 @@ function compareValue(element, comparator) {
   if (elemType !== compType) return false;
 
   switch (compType) {
-    case "array":
+    case 'array':
       return !(
-        comparator.findIndex(
-          (n) => element.findIndex((v) => compareValue(v, n)) === -1
-        ) !== -1
+        comparator.findIndex((n) => element.findIndex((v) => compareValue(v, n)) === -1) !== -1
       );
 
-    case "object":
+    case 'object':
       return !(
-        Object.keys(comparator).findIndex(
-          (key) => !compareValue(element[key], comparator[key])
-        ) !== -1
+        Object.keys(comparator).findIndex((key) => !compareValue(element[key], comparator[key])) !==
+        -1
       );
 
     default:
