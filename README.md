@@ -60,6 +60,8 @@ apply(element, patch, {
 });
 ```
 
+To disable one of the options, you can set them to an empty string, `null` or `false`.
+
 ## compare(element, comparator)
 
 Compares `element` with `comparator` with the following rules. **All checks ignore the order of objects AND ARRAYS.**
