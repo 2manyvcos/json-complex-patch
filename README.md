@@ -60,6 +60,8 @@ Compares `element` with `comparator` with the following rules. **All checks igno
 - If comparator is an object, each value in `comparator` (c) is checked against the value in `element` with the same key (item) with `compareValue(item, c)`. All checks must succeed.
 
 ```js
+import { compareValue } from 'json-complex-patch';
+
 compareValue({ a: 1, b: true, c: [1, 2, 3] }, { a: 1, c: [2] });
 // returns true
 
