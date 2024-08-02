@@ -1,6 +1,6 @@
 {
   "name": "json-complex-patch",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Complex JSON patches",
   "main": "./lib/index.js",
   "scripts": {
@@ -24,14 +24,14 @@
   "keywords": [
     "json",
     "complex",
-    "merge"
+    "patch"
   ],
   "author": "Aaron Burmeister",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/hatsuo/json-complex-merge/issues"
+    "url": "https://github.com/hatsuo/json-complex-patch/issues"
   },
-  "homepage": "https://github.com/hatsuo/json-complex-merge#readme",
+  "homepage": "https://github.com/hatsuo/json-complex-patch#readme",
   "devDependencies": {
     "@babel/cli": "7.13.0",
     "@babel/core": "7.13.8",
